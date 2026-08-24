@@ -2,10 +2,10 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
 export function createLovableAiGatewayProvider(apiKey: string) {
   return createOpenAICompatible({
-    name: "lovable",
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    headers: { "Lovable-API-Key": apiKey },
+    name: "google",
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+    headers: { Authorization: `Bearer ${apiKey}` },
   });
 }
 
-export const CAREER_MODEL = "google/gemini-3-flash-preview";
+export const CAREER_MODEL = "gemini-2.5-flash";

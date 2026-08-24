@@ -10,8 +10,8 @@ import {
 } from "./career-schemas";
 
 function gateway() {
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) throw new Error("Configuration IA manquante (LOVABLE_API_KEY).");
+  const key = process.env["GEMINI_API_KEY"];
+  if (!key) throw new Error("Configuration IA manquante (GEMINI_API_KEY).");
   return createLovableAiGatewayProvider(key);
 }
 
