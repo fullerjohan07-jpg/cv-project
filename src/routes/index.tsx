@@ -195,13 +195,15 @@ function Index() {
         </>
       ) : (
         <main className="min-h-0 flex-1 overflow-y-auto bg-muted/40 p-4 sm:p-8">
-          {tab === "analyse" ? (
+                    {tab === "analyse" ? (
             <AnalysisPanel
               data={data}
               jobOffer={jobOffer}
               setJobOffer={setJobOffer}
               canSpend={left > 0}
               onSpend={onSpend}
+              onFeedback={() => onClaim("feedback")}
+              feedbackGiven={credits.earned.includes("feedback")}
             />
           ) : null}
           {tab === "lettre" ? (

@@ -1,4 +1,4 @@
-import { Check, Gift, Sparkles } from "lucide-react";
+import { Check, Gift, Lock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BONUSES, DAILY_FREE, type CreditsState, remaining } from "@/lib/credits";
 
@@ -13,13 +13,20 @@ export function CreditsPanel({
 }) {
   const share = async () => {
     const url = typeof window !== "undefined" ? window.location.origin : "";
+    let succeeded = false;
     try {
-      if (navigator.share) await navigator.share({ title: "CVfy", url });
-      else await navigator.clipboard?.writeText(url);
+      if (navigator.share) {
+        await navigator.share({ title: "CVfy", url });
+        succeeded = true;
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        succeeded = true;
+      }
     } catch {
-      /* partage annulé */
+      // partage annulé ou refusé par l'utilisateur : pas de crédit
+      succeeded = false;
     }
-    onClaim("share");
+    if (succeeded) onClaim("share");
   };
 
   return (
@@ -48,6 +55,8 @@ export function CreditsPanel({
           {BONUSES.map((b) => {
             const done = state.earned.includes(b.id);
             const locked = b.id === "profile" && completion < 100;
+            const claimableHere = b.id === "share" || b.id === "profile";
+
             return (
               <li
                 key={b.id}
@@ -58,13 +67,16 @@ export function CreditsPanel({
                   <p className="text-xs text-muted-foreground">
                     +{b.amount} crédit{b.amount > 1 ? "s" : ""}
                     {locked ? ` · CV complété à ${completion} %` : ""}
+                    {b.id === "feedback" && !done
+                      ? " · Générez une analyse dans l'onglet Analyse IA pour la débloquer"
+                      : ""}
                   </p>
                 </div>
                 {done ? (
                   <span className="flex items-center gap-1 text-sm text-primary">
                     <Check className="h-4 w-4" /> Obtenu
                   </span>
-                ) : (
+                ) : claimableHere ? (
                   <Button
                     size="sm"
                     variant="outline"
@@ -73,6 +85,10 @@ export function CreditsPanel({
                   >
                     Réclamer
                   </Button>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Lock className="h-3.5 w-3.5" /> À débloquer ailleurs
+                  </span>
                 )}
               </li>
             );

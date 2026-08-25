@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, CheckCircle2, Loader2, Sparkles, Target } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, Sparkles, Target, ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, TextArea } from "@/components/ui/form-controls";
 import { ImportCvField } from "@/components/cv/import-cv-field";
@@ -15,19 +15,29 @@ export function AnalysisPanel({
   setJobOffer,
   canSpend,
   onSpend,
+  onFeedback,
+  feedbackGiven,
 }: {
   data: CVData;
   jobOffer: string;
   setJobOffer: (v: string) => void;
   canSpend: boolean;
   onSpend: () => void;
+  onFeedback: () => void;
+  feedbackGiven: boolean;
 }) {
   const run = useServerFn(analyzeCV);
   const [importedCvText, setImportedCvText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<CVAnalysis | null>(null);
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
+  const sendFeedback = () => {
+    if (feedbackSent || feedbackGiven) return;
+    setFeedbackSent(true);
+    onFeedback();
+  };
   const launch = async () => {
     if (!canSpend) {
       setError("Plus de crédits IA aujourd'hui. Gagnez-en dans l'onglet Crédits.");
@@ -154,13 +164,33 @@ export function AnalysisPanel({
             </div>
           </div>
 
-          {result.questionsEntretien.length ? (
+                    {result.questionsEntretien.length ? (
             <ListCard
               title="Questions d'entretien probables"
               items={result.questionsEntretien}
               icon={<Sparkles className="h-4 w-4 text-primary" />}
             />
           ) : null}
+
+          <div className="rounded-2xl border border-border bg-card p-6 text-center">
+            {feedbackSent || feedbackGiven ? (
+              <p className="text-sm font-medium text-primary">
+                Merci pour votre avis — crédit bonus ajouté (visible dans l'onglet Crédits) !
+              </p>
+            ) : (
+              <>
+                <p className="text-sm font-medium">Cette analyse vous a-t-elle été utile ?</p>
+                <div className="mt-3 flex justify-center gap-3">
+                  <Button variant="outline" size="sm" onClick={sendFeedback}>
+                    <ThumbsUp className="h-4 w-4" /> Utile
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={sendFeedback}>
+                    <ThumbsDown className="h-4 w-4" /> À améliorer
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       ) : null}
     </div>
