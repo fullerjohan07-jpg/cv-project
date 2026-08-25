@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { analyzeInput, letterInput } from "./career-schemas";
+import { analyzeInput, letterInput, importFileInput } from "./career-schemas";
 
 export type { CVPayload, CVAnalysis, CoverLetter } from "./career-schemas";
 
@@ -15,4 +15,12 @@ export const generateCoverLetter = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { runLetter } = await import("./career.server");
     return runLetter(data);
+  });
+
+export const importResumeText = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => importFileInput.parse(input))
+  .handler(async ({ data }) => {
+    const { extractTextFromFile } = await import("./resume-import.server");
+    const text = await extractTextFromFile(data);
+    return { text };
   });

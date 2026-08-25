@@ -77,6 +77,7 @@ export type CoverLetter = z.infer<typeof letterOutput>;
 export const analyzeInput = z.object({
   cv: cvSchema,
   jobOffer: z.string().max(12000).default(""),
+  importedCvText: z.string().max(20000).default(""),
 });
 
 export const letterInput = z.object({
@@ -86,4 +87,11 @@ export const letterInput = z.object({
   role: z.string().max(200).default(""),
   tone: z.enum(["professionnel", "chaleureux", "direct", "audacieux"]).default("professionnel"),
   length: z.enum(["courte", "standard", "detaillee"]).default("standard"),
+  importedCvText: z.string().max(20000).default(""),
+});
+
+export const importFileInput = z.object({
+  base64: z.string().min(1),
+  mimeType: z.string().default(""),
+  fileName: z.string().default("fichier"),
 });

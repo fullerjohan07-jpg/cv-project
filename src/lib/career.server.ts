@@ -81,6 +81,7 @@ const ANALYSIS_JSON_SHAPE = `{
 export async function runAnalysis(input: {
   cv: CVPayload;
   jobOffer: string;
+  importedCvText?: string;
 }): Promise<CVAnalysis> {
   return generateJson(
     "Tu es un recruteur senior francophone et expert ATS. Tu analyses des CV avec franchise, précision et bienveillance. Tes réécritures sont concrètes, chiffrées quand c'est possible, et rédigées en français. Jamais de blabla générique. Tu réponds UNIQUEMENT par un objet JSON valide, sans texte autour, sans balises de code.",
@@ -89,10 +90,15 @@ export async function runAnalysis(input: {
       input.jobOffer
         ? `Confronte-le à cette offre d'emploi et note l'adéquation en conséquence:\n"""${input.jobOffer}"""`
         : "Aucune offre fournie : évalue l'adéquation par rapport au titre visé du candidat.",
-      `CV:\n"""${cvToText(input.cv)}"""`,
+      `CV (formulaire structuré):\n"""${cvToText(input.cv)}"""`,
+      input.importedCvText
+        ? `Texte brut extrait du CV importé par le candidat (contient parfois des détails absents du formulaire, à prendre en compte en complément) :\n"""${input.importedCvText}"""`
+        : "",
       "Donne 3 à 6 points forts, 3 à 6 faiblesses, jusqu'à 10 mots-clés manquants, 3 à 6 réécritures prêtes à copier-coller, et 4 questions d'entretien probables.",
       `Format JSON exact attendu :\n${ANALYSIS_JSON_SHAPE}`,
-    ].join("\n\n"),
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
     analysisOutput,
   );
 }
@@ -112,6 +118,7 @@ export async function runLetter(input: {
   role: string;
   tone: string;
   length: "courte" | "standard" | "detaillee";
+  importedCvText?: string;
 }): Promise<CoverLetter> {
   const lengthHint = {
     courte: "2 paragraphes courts (max 120 mots au total).",
@@ -121,16 +128,21 @@ export async function runLetter(input: {
 
   return generateJson(
     "Tu rédiges des lettres de motivation en français, assorties au CV du candidat : même ton, mêmes preuves, mêmes chiffres. Tu es concret, tu bannis les clichés ('dynamique et motivé', 'depuis mon plus jeune âge'), tu ne fabules jamais d'expérience inexistante. Tu réponds UNIQUEMENT par un objet JSON valide, sans texte autour, sans balises de code.",
-    [
+        [
       `Rédige une lettre de motivation pour ${input.role || "le poste visé"}${input.company ? ` chez ${input.company}` : ""}.`,
       `Ton souhaité : ${input.tone}. Longueur : ${lengthHint}`,
       input.jobOffer
         ? `Offre d'emploi:\n"""${input.jobOffer}"""`
         : "Pas d'offre fournie : appuie-toi sur le CV.",
-      `CV du candidat:\n"""${cvToText(input.cv)}"""`,
+      `CV du candidat (formulaire structuré):\n"""${cvToText(input.cv)}"""`,
+      input.importedCvText
+        ? `Texte brut extrait du CV importé (détails complémentaires à exploiter) :\n"""${input.importedCvText}"""`
+        : "",
       "Ajoute 3 conseils courts pour personnaliser encore la lettre avant envoi.",
       `Format JSON exact attendu :\n${LETTER_JSON_SHAPE}`,
-    ].join("\n\n"),
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
     letterOutput,
   );
 }

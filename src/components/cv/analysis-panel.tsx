@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CheckCircle2, Loader2, Sparkles, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, TextArea } from "@/components/ui/form-controls";
+import { ImportCvField } from "@/components/cv/import-cv-field";
 import { analyzeCV, type CVAnalysis } from "@/lib/career.functions";
 import { toCVPayload } from "@/lib/cv-payload";
 import type { CVData } from "@/lib/cv-types";
@@ -22,6 +23,7 @@ export function AnalysisPanel({
   onSpend: () => void;
 }) {
   const run = useServerFn(analyzeCV);
+  const [importedCvText, setImportedCvText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<CVAnalysis | null>(null);
@@ -34,7 +36,7 @@ export function AnalysisPanel({
     setLoading(true);
     setError("");
     try {
-      const res = await run({ data: { cv: toCVPayload(data), jobOffer } });
+      const res = await run({ data: { cv: toCVPayload(data), jobOffer, importedCvText } });
       setResult(res as CVAnalysis);
       onSpend();
     } catch (e) {
@@ -55,6 +57,15 @@ export function AnalysisPanel({
           Collez l'offre d'emploi visée : le score d'adéquation et les réécritures seront calibrés
           dessus. Sans offre, l'analyse se base sur votre titre.
         </p>
+        <div className="mt-4">
+          <Field label="Importer un CV existant (optionnel)">
+            <ImportCvField onExtracted={setImportedCvText} />
+          </Field>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Utile si votre CV contient des détails que vous n'avez pas (encore) remplis dans le
+            formulaire ci-dessus. L'IA combinera les deux.
+          </p>
+        </div>
         <div className="mt-4">
           <Field label="Offre d'emploi (optionnel)">
             <TextArea

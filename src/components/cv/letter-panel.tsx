@@ -3,10 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { Download, Loader2, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, Select, TextArea, TextInput } from "@/components/ui/form-controls";
+import { ImportCvField } from "@/components/cv/import-cv-field";
 import { generateCoverLetter, type CoverLetter } from "@/lib/career.functions";
 import { toCVPayload } from "@/lib/cv-payload";
 import type { CVData } from "@/lib/cv-types";
-
 export function LetterPanel({
   data,
   jobOffer,
@@ -25,6 +25,7 @@ export function LetterPanel({
   const [role, setRole] = useState("");
   const [tone, setTone] = useState("professionnel");
   const [length, setLength] = useState("standard");
+  const [importedCvText, setImportedCvText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [letter, setLetter] = useState<CoverLetter | null>(null);
@@ -45,6 +46,7 @@ export function LetterPanel({
           role: role || data.personal.title,
           tone: tone as "professionnel",
           length: length as "standard",
+          importedCvText,
         },
       });
       setLetter(res as CoverLetter);
@@ -106,6 +108,12 @@ export function LetterPanel({
               <option value="standard">Standard</option>
               <option value="detaillee">Détaillée</option>
             </Select>
+          </Field>
+        </div>
+
+                <div className="mt-4">
+          <Field label="Importer un CV existant (optionnel)">
+            <ImportCvField onExtracted={setImportedCvText} />
           </Field>
         </div>
 
