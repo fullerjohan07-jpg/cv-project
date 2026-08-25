@@ -152,6 +152,8 @@ const TEMPLATES: { id: TemplateId; name: string; desc: string }[] = [
   { id: 'modern', name: 'Moderne', desc: 'Épuré, deux colonnes' },
   { id: 'classic', name: 'Classique', desc: 'Élégant, sérif centré' },
   { id: 'creative', name: 'Créatif', desc: 'Barre latérale colorée' },
+  { id: 'executive', name: 'Exécutif', desc: 'Sobre, sidebar sombre' },
+  { id: 'minimal', name: 'Minimaliste', desc: 'Épuré, une colonne' },
 ]
 
 function TemplateStep({ data, update }: { data: CVData; update: Updater }) {
@@ -232,6 +234,33 @@ function TemplateThumb({ id, accent }: { id: TemplateId; accent: string }) {
       </div>
     )
   }
+  if (id === 'executive') {
+    return (
+      <div className="flex h-24 overflow-hidden rounded-md border border-border bg-white">
+        <div className="w-1/3 bg-neutral-900 p-1.5">
+          <div className="mx-auto h-4 w-4 rounded-full bg-white/20" />
+        </div>
+        <div className="flex-1 space-y-1 p-2">
+          <div className="h-2 w-3/4 rounded bg-neutral-800" />
+          <div className="h-1 w-1/2 rounded bg-neutral-300" />
+          <div className="mt-2 h-1 w-full rounded bg-neutral-200" />
+          <div className="h-1 w-full rounded bg-neutral-200" />
+          <div className="h-1 w-2/3 rounded bg-neutral-200" />
+        </div>
+      </div>
+    )
+  }
+  if (id === 'minimal') {
+    return (
+      <div className="flex h-24 flex-col gap-1.5 rounded-md border border-border bg-white p-3">
+        <div className="h-2 w-2/3 rounded bg-neutral-800" />
+        <div className="h-1 w-1/3 rounded" style={{ backgroundColor: accent }} />
+        <div className="mt-2 h-1 w-full rounded bg-neutral-200" />
+        <div className="h-1 w-full rounded bg-neutral-200" />
+        <div className="h-1 w-1/2 rounded bg-neutral-200" />
+      </div>
+    )
+  }
   return (
     <div className="h-24 overflow-hidden rounded-md border border-border bg-white">
       <div className="h-1.5 w-full" style={{ backgroundColor: accent }} />
@@ -252,7 +281,6 @@ function TemplateThumb({ id, accent }: { id: TemplateId; accent: string }) {
     </div>
   )
 }
-
 /* ---------------- Personal step ---------------- */
 
 function PersonalStep({ data, update }: { data: CVData; update: Updater }) {
