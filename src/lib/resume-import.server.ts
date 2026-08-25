@@ -1,4 +1,4 @@
-import pdfParse from "pdf-parse";
+import { extractText, getDocumentProxy } from "unpdf";
 import mammoth from "mammoth";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 Mo
@@ -16,8 +16,9 @@ export async function extractTextFromFile(input: {
   const name = input.fileName.toLowerCase();
 
   if (input.mimeType === "application/pdf" || name.endsWith(".pdf")) {
-    const result = await pdfParse(buffer);
-    return cleanText(result.text);
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    const { text } = await extractText(pdf, { mergePages: true });
+    return cleanText(text);
   }
 
   if (
