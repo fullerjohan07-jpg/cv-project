@@ -1,6 +1,5 @@
-import { generateText } from "ai";
 import type { z } from "zod";
-import { createLovableAiGatewayProvider, CAREER_MODEL } from "./ai-gateway.server";
+import { callGemini, CAREER_MODEL } from "./ai-gateway.server";
 import {
   analysisOutput,
   letterOutput,
@@ -9,10 +8,10 @@ import {
   type CVPayload,
 } from "./career-schemas";
 
-function gateway() {
+function apiKey() {
   const key = process.env["GEMINI_API_KEY"];
   if (!key) throw new Error("Configuration IA manquante (GEMINI_API_KEY).");
-  return createLovableAiGatewayProvider(key);
+  return key;
 }
 
 function extractJson(text: string): unknown {
@@ -35,14 +34,13 @@ async function generateJson<T>(
   prompt: string,
   schema: z.ZodType<T>,
 ): Promise<T> {
-  const ai = gateway();
-  const result = await generateText({
-    model: ai(CAREER_MODEL),
+  const text = await callGemini({
+    apiKey: apiKey(),
+    model: CAREER_MODEL,
     system,
     prompt,
-    temperature: 0.4,
   });
-  return schema.parse(extractJson(result.text));
+  return schema.parse(extractJson(text));
 }
 
 export function cvToText(cv: CVPayload) {
